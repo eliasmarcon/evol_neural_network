@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.asp": "asp",
+        "ex20.C": "cpp",
+        "ex1.C": "cpp",
+        "ex2.C": "cpp",
+        "seed.C": "cpp"
+    }
+}

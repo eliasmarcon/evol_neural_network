@@ -1,13 +1,17 @@
 // PythonCaller.cpp
 #include "PythonCaller.h"
 
+PythonCaller::PythonCaller() {
+    Py_Initialize();
+}
+
+PythonCaller::~PythonCaller() {
+    Py_Finalize();
+}
+
 PyObject* PythonCaller::CallPythonFunction(const std::string &moduleName, 
                                            const std::string &functionName, 
                                            PyObject *args) {
-    Py_Initialize();
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append('.')");
-
     PyObject *pName = PyUnicode_FromString(moduleName.c_str());
     PyObject *pModule = PyImport_Import(pName);
     Py_DECREF(pName);
@@ -30,6 +34,5 @@ PyObject* PythonCaller::CallPythonFunction(const std::string &moduleName,
         PyErr_Print();
     }
 
-    Py_Finalize();
     return pResult;
 }

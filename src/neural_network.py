@@ -38,23 +38,19 @@ def neuralnet(training_data, weights, biases):
 
     return model
 
-if __name__ == "__main__":
+def main(parameters, layer_sizes): 
 
-    # get input 
-    if len(sys.argv) != 3:
-        print("Usage: python cnn.py <weights> <biases>")
-        sys.exit(1)
-    else:
-        weights = sys.argv[1]
-        biases = sys.argv[2]
-        
+    # Print input
+    print(f"parameters:\n {parameters}")
+    print(f"layer_sizes:\n {layer_sizes}")
+    
     # Load data
-    X_train_scaled, x = data()
+    #X_train_scaled, x = data()
 
     # Create model
-    model = neuralnet(X_train_scaled, weights, biases)
+    #model = neuralnet(X_train_scaled, weights, biases)
     
     # Evaluate the model on the test set
-    test_loss, test_acc = model.evaluate(X_train_scaled, y)
-    print(f"Test Accuracy: {test_acc}")
+    #test_loss, test_acc = model.evaluate(X_train_scaled, y)
+    #print(f"Test Accuracy: {test_acc}")
 

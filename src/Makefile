@@ -8,7 +8,7 @@ PYTHON_LIB = /usr/lib/python$(PYTHON_VERSION)
 # Source files and object files
 SRC = main.cpp PythonCaller.cpp
 OBJ = $(SRC:.cpp=.o)
-TARGET = main
+TARGET = neural_network
 
 # Default target
 all: $(TARGET)

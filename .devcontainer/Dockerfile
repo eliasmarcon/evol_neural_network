@@ -8,6 +8,12 @@ RUN useradd -m -s /bin/bash ${USERNAME} && \
 
 RUN apt-get update && apt-get install -y wget gcc git make g++
 
+# Installing Python 3.11 and python3-dev
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+RUN apt-get install -y python3.11 python3.11-dev
+
 # Set non-interactive frontend (useful for Docker builds)
 ENV DEBIAN_FRONTEND noninteractive
 

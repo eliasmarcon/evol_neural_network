@@ -67,6 +67,8 @@ float objective(GAGenome &g)
     }
     std::cout << std::endl;
 
+    
+
 
     // Ensure Python interpreter is initialized
     PyObject* pWeights = PythonCaller::Vector2DToPyList(weights);
@@ -76,7 +78,7 @@ float objective(GAGenome &g)
     PyTuple_SetItem(pArgs, 0, pWeights);
     PyTuple_SetItem(pArgs, 1, pInput);
 
-    PythonCaller::CallPythonFunction("neural_network", "test", pArgs);
+    PythonCaller::CallPythonFunction("neural_network", "main", pArgs);
 
 }
 

@@ -1,7 +1,7 @@
 # Compiler and flags
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++11 -Ofast -fpermissive
-PYTHON_VERSION = 3.8
+PYTHON_VERSION = 3.10
 PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
 PYTHON_LIB = /usr/lib/python$(PYTHON_VERSION)
 

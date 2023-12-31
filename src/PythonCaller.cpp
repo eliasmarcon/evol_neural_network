@@ -1,8 +1,19 @@
 // PythonCaller.cpp
 #include "PythonCaller.h"
 
+
+// Explicit instantiations of ConvertToPyValue for required types
+template PyObject* ConvertToPyValue<int>(const int&);
+template PyObject* ConvertToPyValue<long>(const long&);
+template PyObject* ConvertToPyValue<double>(const double&);
+template PyObject* ConvertToPyValue<std::string>(const std::string&);
+template PyObject* ConvertToPyValue<float>(const float&);
+
 PythonCaller::PythonCaller() {
     Py_Initialize();
+    // Set the Python path to include the current directory
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append('.')");
 }
 
 PythonCaller::~PythonCaller() {
@@ -12,6 +23,8 @@ PythonCaller::~PythonCaller() {
 PyObject* PythonCaller::CallPythonFunction(const std::string &moduleName, 
                                            const std::string &functionName, 
                                            PyObject *args) {
+
+    // Import the Python script
     PyObject *pName = PyUnicode_FromString(moduleName.c_str());
     PyObject *pModule = PyImport_Import(pName);
     Py_DECREF(pName);

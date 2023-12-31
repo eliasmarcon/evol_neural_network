@@ -5,7 +5,10 @@
         "vscode": {
             "settings": { 
                 "terminal.integrated.shell.linux": "/bin/bash"
-            }
+            },
+            "extensions": [
+                "ms-vsliveshare.vsliveshare"
+            ]
         }
     }
     // "forwardPorts": [8080], // Uncomment or modify if port forwarding is needed

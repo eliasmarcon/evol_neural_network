@@ -13,9 +13,11 @@ public:
     PythonCaller();
     ~PythonCaller();
 
-    static PyObject* CallPythonFunction(const std::string &moduleName, 
-                                        const std::string &functionName, 
-                                        PyObject *args);
+    static PyObject* CallPythonFunction(const std::string& moduleName,
+                                        const std::string& functionName,
+                                        PyObject* args,
+                                        float& testLoss,
+                                        float& testAcc);
 
     template <typename T>
     static PyObject* VectorToPyList(const std::vector<T>& vec);

@@ -9,50 +9,54 @@
 
 const int POPULATION_SIZE = 2;
 const int MAX_GENERATIONS = 3;
+const float MIN_ACCURACY = 0.85;
+const float MIN_LOSS = 0.15;
 const float MEAN_WEIGHTS = 0.0;
 const float MEAN_BIAS = 0.1;
 const float STDDEV = 0.05;
 
 const int EMPTY_PLACEHOLDER = 0;
-/*
+
 const std::vector<int> IN_WEIGHTS = {13, 64, 32};
 const std::vector<int> OUT_WEIGHTS = {64, 32, 1};
-*/
 
+
+/*
 // Testing values
 const std::vector<int> IN_WEIGHTS = {2, 4, 3};
 const std::vector<int> OUT_WEIGHTS = {4, 3, 1};
-
+*/
 
 // Objective function
 float objective(GAGenome &g)
 {
-    
-    // PythonCaller pythonCaller;
+    int fitness = 2;
+
+    PythonCaller pythonCaller;
 
     GA2DArrayGenome<float>& genome = (GA2DArrayGenome<float>&)g;
 
-    // // shape of the layers
-    // std::vector<int> input_python = OUT_WEIGHTS;
+    // shape of the layers
+    std::vector<int> input_python = OUT_WEIGHTS;
     
-    // input_python.insert(input_python.begin(), IN_WEIGHTS[0]);
+    input_python.insert(input_python.begin(), IN_WEIGHTS[0]);
     
-    // // get the values of the genome and put them in a 2 dimensional vector
-    // std::vector<std::vector<float>> weights;
+    // get the values of the genome and put them in a 2 dimensional vector
+    std::vector<std::vector<float>> weights;
     
-    // // put the values of each genome row into a vector without 0
-    // for (int i = 0; i < genome.width(); i++)
-    // {
-    //     std::vector<float> row;
-    //     for (int j = 0; j < genome.height(); j++)
-    //     {
-    //         if (genome.gene(i, j) != EMPTY_PLACEHOLDER)
-    //         {
-    //             row.push_back(genome.gene(i, j));
-    //         }
-    //     }
-    //     weights.push_back(row);
-    // }
+    // put the values of each genome row into a vector without 0
+    for (int i = 0; i < genome.width(); i++)
+    {
+        std::vector<float> row;
+        for (int j = 0; j < genome.height(); j++)
+        {
+            if (genome.gene(i, j) != EMPTY_PLACEHOLDER)
+            {
+                row.push_back(genome.gene(i, j));
+            }
+        }
+        weights.push_back(row);
+    }
 
 
     // // Display the 2D vector
@@ -66,19 +70,30 @@ float objective(GAGenome &g)
     // }
     // std::cout << std::endl;
 
-    // // Ensure Python interpreter is initialized
-    // PyObject* pWeights = PythonCaller::Vector2DToPyList(weights);
-    // PyObject* pInput = PythonCaller::VectorToPyList(input_python);
+    // Ensure Python interpreter is initialized
+    PyObject* pWeights = PythonCaller::Vector2DToPyList(weights);
+    PyObject* pInput = PythonCaller::VectorToPyList(input_python);
 
-    // PyObject* pArgs = PyTuple_New(2);
-    // PyTuple_SetItem(pArgs, 0, pWeights);
-    // PyTuple_SetItem(pArgs, 1, pInput);
+    PyObject* pArgs = PyTuple_New(2);
+    PyTuple_SetItem(pArgs, 0, pWeights);
+    PyTuple_SetItem(pArgs, 1, pInput);
 
-    // PythonCaller::CallPythonFunction("neural_network", "main", pArgs);
+    float testLoss, testAcc;
+    PythonCaller::CallPythonFunction("neural_network", "main", pArgs, testLoss, testAcc);
 
-    const int testScore = 4;
+    std::cout << "C++ Output" << std::endl;
+    std::cout << "Test loss: " << testLoss << std::endl;
+    std::cout << "Test accuracy: " << testAcc << std::endl << std::endl;
 
-    return testScore;
+    if (testLoss < MIN_LOSS){
+        --fitness;
+    }
+    
+    if (testAcc < MIN_ACCURACY){
+        --fitness;
+    }
+
+    return (float)fitness;
 
 }
 
@@ -124,16 +139,16 @@ void initializer(GAGenome &g)
         ++in_offset;
     }
 
-    //print genome
-    for (int i = 0; i < genome.width(); i++)
-    {
-        for (int j = 0; j < genome.height(); j++)
-        {
-            std::cout << genome.gene(i, j) << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    // //print genome
+    // for (int i = 0; i < genome.width(); i++)
+    // {
+    //     for (int j = 0; j < genome.height(); j++)
+    //     {
+    //         std::cout << genome.gene(i, j) << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // std::cout << std::endl;
 }
 
 // Mutator
@@ -144,6 +159,9 @@ int mutator(GAGenome &g, float p)
 
     if (GAFlipCoin(p))
     {
+        // change the sign of a random number in the genome
+        
+        
         ++nMutations;
     }
 

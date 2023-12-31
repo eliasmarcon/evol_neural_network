@@ -7,9 +7,7 @@
 #include <random>
 #include "PythonCaller.h"
 
-using namespace std;
-
-const int POPULATION_SIZE = 1;
+const int POPULATION_SIZE = 2;
 const int MAX_GENERATIONS = 3;
 const float MEAN_WEIGHTS = 0.0;
 const float MEAN_BIAS = 0.1;
@@ -18,7 +16,7 @@ const float STDDEV = 0.05;
 const int EMPTY_PLACEHOLDER = 0;
 /*
 const std::vector<int> IN_WEIGHTS = {13, 64, 32};
-const std::vector<int> OUT_WEIGHTS = §{64, 32, 1};
+const std::vector<int> OUT_WEIGHTS = {64, 32, 1};
 */
 
 // Testing values
@@ -29,53 +27,58 @@ const std::vector<int> OUT_WEIGHTS = {4, 3, 1};
 // Objective function
 float objective(GAGenome &g)
 {
-    PythonCaller pythonCaller;
+    
+    // PythonCaller pythonCaller;
 
     GA2DArrayGenome<float>& genome = (GA2DArrayGenome<float>&)g;
 
-    // shape of the layers
-    std::vector<int> input_python = OUT_WEIGHTS;
+    // // shape of the layers
+    // std::vector<int> input_python = OUT_WEIGHTS;
     
-    input_python.insert(input_python.begin(), IN_WEIGHTS[0]);
+    // input_python.insert(input_python.begin(), IN_WEIGHTS[0]);
     
-    // get the values of the genome and put them in a 2 dimensional vector
-    std::vector<std::vector<float>> weights;
+    // // get the values of the genome and put them in a 2 dimensional vector
+    // std::vector<std::vector<float>> weights;
     
-    // put the values of each genome row into a vector without 0
-    for (int i = 0; i < genome.width(); i++)
-    {
-        std::vector<float> row;
-        for (int j = 0; j < genome.height(); j++)
-        {
-            if (genome.gene(i, j) != EMPTY_PLACEHOLDER)
-            {
-                row.push_back(genome.gene(i, j));
-            }
-        }
-        weights.push_back(row);
-    }
+    // // put the values of each genome row into a vector without 0
+    // for (int i = 0; i < genome.width(); i++)
+    // {
+    //     std::vector<float> row;
+    //     for (int j = 0; j < genome.height(); j++)
+    //     {
+    //         if (genome.gene(i, j) != EMPTY_PLACEHOLDER)
+    //         {
+    //             row.push_back(genome.gene(i, j));
+    //         }
+    //     }
+    //     weights.push_back(row);
+    // }
 
 
-    // Display the 2D vector
-    std::cout << std::endl;
-    std::cout << "Weights Vector" << std::endl;
-    for (const auto& row : weights) {
-        for (float value : row) {
-            std::cout << value << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    // // Display the 2D vector
+    // std::cout << std::endl;
+    // std::cout << "Weights Vector" << std::endl;
+    // for (const auto& row : weights) {
+    //     for (float value : row) {
+    //         std::cout << value << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // std::cout << std::endl;
 
-    // Ensure Python interpreter is initialized
-    PyObject* pWeights = PythonCaller::Vector2DToPyList(weights);
-    PyObject* pInput = PythonCaller::VectorToPyList(input_python);
+    // // Ensure Python interpreter is initialized
+    // PyObject* pWeights = PythonCaller::Vector2DToPyList(weights);
+    // PyObject* pInput = PythonCaller::VectorToPyList(input_python);
 
-    PyObject* pArgs = PyTuple_New(2);
-    PyTuple_SetItem(pArgs, 0, pWeights);
-    PyTuple_SetItem(pArgs, 1, pInput);
+    // PyObject* pArgs = PyTuple_New(2);
+    // PyTuple_SetItem(pArgs, 0, pWeights);
+    // PyTuple_SetItem(pArgs, 1, pInput);
 
-    PythonCaller::CallPythonFunction("neural_network", "main", pArgs);
+    // PythonCaller::CallPythonFunction("neural_network", "main", pArgs);
+
+    const int testScore = 4;
+
+    return testScore;
 
 }
 
@@ -92,7 +95,7 @@ void initializer(GAGenome &g)
     
     int in_offset = 0;
     
-    for (int i = 0; i < IN_WEIGHTS.size(); ++i)
+    for (int i = 0; i < static_cast<int>(IN_WEIGHTS.size()); ++i)
     {
         int in_val_weights = IN_WEIGHTS[i];
         int out_val_weights = OUT_WEIGHTS[i];
@@ -126,24 +129,90 @@ void initializer(GAGenome &g)
     {
         for (int j = 0; j < genome.height(); j++)
         {
-        
-            cout << genome.gene(i, j) << " ";
-        
+            std::cout << genome.gene(i, j) << " ";
         }
-        cout << endl;
+        std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
 // Mutator
 int mutator(GAGenome &g, float p)
 {
-    
+    GA2DArrayGenome<float>& genome = (GA2DArrayGenome<float>&)g;
+    int nMutations = 0;
+
+    if (GAFlipCoin(p))
+    {
+        ++nMutations;
+    }
+
+    return nMutations;
 }
 
 // Crossover
 int crossover(const GAGenome &p1, const GAGenome &p2, GAGenome *c1, GAGenome *c2)
 {
-    
+    GA2DArrayGenome<float>& parent1 = (GA2DArrayGenome<float>&)p1;
+    GA2DArrayGenome<float>& parent2 = (GA2DArrayGenome<float>&)p2;
+
+    // Add values of parents togehter and take the mean and same them in a 2d vector
+    std::vector<std::vector<float>> saveVectorParent1(parent1.width(), std::vector<float>(parent1.height(), 0));
+    std::vector<std::vector<float>> saveVectorParent2(parent1.width(), std::vector<float>(parent1.height(), 0));
+    std::vector<std::vector<float>> saveVectorMean(parent1.width(), std::vector<float>(parent1.height(), 0));
+
+    std::default_random_engine rng(std::random_device{}());
+    // one value between 0 and 1
+    float weight = std::round(std::uniform_real_distribution<float>(0, 1)(rng) * 100) / 100;
+
+    //print value
+    std::cout << "distribution: " << weight << std::endl;
+
+    for (int i = 0; i < parent1.width(); i++){
+        for (int j = 0; j < parent1.height(); j++){
+            saveVectorParent1[i][j] = ((parent1.gene(i, j) * (1-weight)) + (parent2.gene(i, j) * weight));        
+            saveVectorParent2[i][j] = ((parent1.gene(i, j) * weight) + (parent2.gene(i, j) * (1-weight)));
+            saveVectorMean[i][j] = (parent1.gene(i, j) + parent2.gene(i, j))*0.5;   
+        }
+    }
+    // create two children
+    if (c1 && c2){
+
+        GA2DArrayGenome<float>& child1 = (GA2DArrayGenome<float>&)*c1;
+        GA2DArrayGenome<float>& child2 = (GA2DArrayGenome<float>&)*c2;
+
+        for (int i = 0; i < parent1.width(); i++){
+            for (int j = 0; j < parent1.height(); j++){
+                child1.gene(i, j, saveVectorParent1[i][j]);
+                child2.gene(i, j, saveVectorParent2[i][j]);
+            }
+        }
+
+        // // print saveVector
+        // std::cout << "child1" << std::endl;
+        // for (int i = 0; i < child1.width(); i++){
+        //     for (int j = 0; j < child1.height(); j++){
+        //         std::cout << child1.gene(i, j) << " ";
+        //     }
+        //     std::cout << std::endl;
+        // }
+        
+        return 2;
+    }
+    else if(c1){
+        
+        GA2DArrayGenome<float>& child = (GA2DArrayGenome<float>&)*c1;
+
+        for (int i = 0; i < parent1.width(); i++){
+            for (int j = 0; j < parent1.height(); j++){
+                child.gene(i, j, saveVectorMean[i][j]);
+            }
+        }
+
+        return 1;
+    }else{
+        return 0;
+    }
 }
 
 int main()
@@ -163,7 +232,7 @@ int main()
             max = weight;
     }
 
-    GA2DArrayGenome<float> genome(sumIN + IN_WEIGHTS.size(), max, objective);
+    GA2DArrayGenome<float> genome(sumIN + static_cast<int>(IN_WEIGHTS.size()), max, objective);
     genome.initializer(initializer);
     genome.mutator(mutator);
     genome.crossover(crossover);
@@ -182,7 +251,7 @@ int main()
     // {
     //     cout << bestGenome.gene(i, j) + 1;
     // }
-    cout << endl;
+    std::cout << std::endl;
 
     return 0;
 }

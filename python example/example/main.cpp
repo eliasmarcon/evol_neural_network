@@ -7,8 +7,8 @@ int main() {
     
     // Example 2D vector
     std::vector<std::vector<float>> my2DVector = {
-        {1.0f, 2.0f, 3.0f},
-        {4.0f, 5.0f, 6.0f}
+        {1.234f, 2.1434f, 3.0f},
+        {4.0f, 5.0f, 6.43263456656540f}
     };
 
     PyObject* pList = pyCaller.Vector2DToPyList(my2DVector);

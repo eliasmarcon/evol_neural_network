@@ -15,7 +15,7 @@ PythonCaller::PythonCaller() {
     // PyRun_SimpleString("print(sys.version)");
     // PyRun_SimpleString("print(sys.executable)");
     // PyRun_SimpleString("help('modules')");
-    PyRun_SimpleString("sys.path.append('.')");
+    PyRun_SimpleString("sys.path.append('./src')");
 }
 
 

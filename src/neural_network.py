@@ -43,6 +43,9 @@ def main(parameters, layer_sizes):
     # Print input
     print(f"parameters:\n {parameters}")
     print(f"layer_sizes:\n {layer_sizes}")
+
+    # Format parameters
+    formatted_params = format_nn_parameters(parameters, layer_sizes)
     
     # Load data
     #X_train_scaled, x = data()
@@ -54,3 +57,26 @@ def main(parameters, layer_sizes):
     #test_loss, test_acc = model.evaluate(X_train_scaled, y)
     #print(f"Test Accuracy: {test_acc}")
 
+
+def format_nn_parameters(parameters, layer_sizes):
+    formatted_params = []
+    param_index = 0
+
+    for i in range(len(layer_sizes) - 1):
+        layer_params = {
+            "weights": [],
+            "biases": []
+        }
+
+        # Extract weights for the current layer
+        for _ in range(layer_sizes[i]):
+            layer_params["weights"].append(parameters[param_index])
+            param_index += 1
+
+        # Extract biases for the next layer
+        layer_params["biases"] = parameters[param_index]
+        param_index += 1
+
+        formatted_params.append(layer_params)
+
+    return formatted_params

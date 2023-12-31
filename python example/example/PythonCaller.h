@@ -46,6 +46,11 @@ inline PyObject* ConvertToPyValue<double>(const double& value) {
     return PyFloat_FromDouble(value);
 }
 
+template<>
+inline PyObject* ConvertToPyValue<float>(const float& value) {
+    return PyFloat_FromDouble(static_cast<double>(value));
+}
+
 template <>
 inline PyObject* ConvertToPyValue<std::string>(const std::string& value) {
     return PyUnicode_FromString(value.c_str());

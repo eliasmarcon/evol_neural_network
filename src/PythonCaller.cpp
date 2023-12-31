@@ -11,10 +11,13 @@ template PyObject* ConvertToPyValue<float>(const float&);
 
 PythonCaller::PythonCaller() {
     Py_Initialize();
-    // Set the Python path to include the current directory
     PyRun_SimpleString("import sys");
+    // PyRun_SimpleString("print(sys.version)");
+    // PyRun_SimpleString("print(sys.executable)");
+    // PyRun_SimpleString("help('modules')");
     PyRun_SimpleString("sys.path.append('.')");
 }
+
 
 PythonCaller::~PythonCaller() {
     Py_Finalize();

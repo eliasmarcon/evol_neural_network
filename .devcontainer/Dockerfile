@@ -37,7 +37,7 @@ RUN apt-get install -y python3-pip
 RUN python3.11 -m pip install --upgrade pip
 
 # Install Python packages: numpy, pandas, tensorflow
-RUN python3.11 -m pip install numpy pandas tensorflow
+RUN python3.11 -m pip install numpy pandas tensorflow scikit-learn
 
 # Switch to the new user
 USER ${USERNAME}

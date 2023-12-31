@@ -67,9 +67,6 @@ float objective(GAGenome &g)
     }
     std::cout << std::endl;
 
-    
-
-
     // Ensure Python interpreter is initialized
     PyObject* pWeights = PythonCaller::Vector2DToPyList(weights);
     PyObject* pInput = PythonCaller::VectorToPyList(input_python);

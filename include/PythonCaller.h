@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <iostream>
 
 class PythonCaller {
 public:
@@ -69,6 +70,7 @@ PyObject* PythonCaller::VectorToPyList(const std::vector<T>& vec) {
 
 template <typename T>
 PyObject* PythonCaller::Vector2DToPyList(const std::vector<std::vector<T>>& vec) {
+    std::cout<<"Vector2DToPyList"<<std::endl;
     PyObject* pList = PyList_New(vec.size());
     if (!pList) throw std::runtime_error("Failed to create Python list for 2D vector");
 

@@ -2,6 +2,9 @@ FROM ubuntu:latest
 
 ARG USERNAME=jlangela
 
+# Set non-interactive frontend (useful for Docker builds)
+ENV DEBIAN_FRONTEND noninteractive
+
 # Create a new user and configure sudo
 RUN useradd -m -s /bin/bash ${USERNAME} && \
     mkdir -p /etc/sudoers.d && \
@@ -15,9 +18,6 @@ RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install -y python3.11 python3.11-dev
-
-# Set non-interactive frontend (useful for Docker builds)
-ENV DEBIAN_FRONTEND noninteractive
 
 # Download and install GALib
 WORKDIR /tmp

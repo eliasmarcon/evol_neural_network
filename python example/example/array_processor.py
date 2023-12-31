@@ -1,3 +1,3 @@
-# array_processor.py
-def process_array(arr):
-    return [x * 2 for x in arr]  # Example processing: double each element
+def process_2d_array(arr):
+    print("Received 2D array:", arr)
+    # Additional processing...

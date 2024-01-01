@@ -73,8 +73,8 @@ def main(parameters, layer_sizes):
     # Evaluate the model on the test set
     test_loss, test_acc = model.evaluate(X_train_scaled, y)
     
-    print(f"\nTest Loss: {test_loss}")
-    print(f"Test Accuracy: {test_acc}\n")
+    # print(f"\nTest Loss: {test_loss}")
+    # print(f"Test Accuracy: {test_acc}\n")
     
     return test_loss, test_acc
 

@@ -5,12 +5,17 @@
 #include <cstdlib>
 #include <iostream>
 #include <random>
+#include <vector>
+#include <algorithm>
 #include "PythonCaller.h"
 
-const int POPULATION_SIZE = 200;
-const int MAX_GENERATIONS = 3000;
+const int POPULATION_SIZE = 100;
+const int MAX_GENERATIONS = 10000;
+
 const float MIN_ACCURACY = 0.85;
-const float MIN_LOSS = 0.15;
+const float MAX_ACCURACY = 1.0;
+const float MIN_LOSS = 0.1;
+
 const float MEAN_WEIGHTS = 0.0;
 const float MEAN_BIAS = 0.1;
 const float STDDEV = 0.05;
@@ -19,6 +24,7 @@ const int EMPTY_PLACEHOLDER = 0;
 
 const std::vector<int> IN_WEIGHTS = {13, 64, 32};
 const std::vector<int> OUT_WEIGHTS = {64, 32, 1};
+
 
 /*
 // Testing values
@@ -29,7 +35,7 @@ const std::vector<int> OUT_WEIGHTS = {4, 3, 1};
 // Objective function
 float objective(GAGenome &g)
 {
-    int fitness = 2;
+    float fitness = 2.0;
 
     GA2DArrayGenome<float> &genome = (GA2DArrayGenome<float> &)g;
 
@@ -82,17 +88,27 @@ float objective(GAGenome &g)
     // std::cout << "Test accuracy: " << testAcc << std::endl
     //           << std::endl;
 
-    if (testLoss < MIN_LOSS)
+    float lossPenalty = 0.0;
+    float accPenalty = 0.0;
+
+    if (testLoss > MIN_LOSS)
     {
-        --fitness;
+        lossPenalty = testLoss - MIN_LOSS;
     }
 
-    if (testAcc < MIN_ACCURACY)
+    if (testAcc < MAX_ACCURACY)
     {
-        --fitness;
+        accPenalty = MAX_ACCURACY - testAcc;
     }
 
-    return (float)fitness;
+    float fitnessPenalty = lossPenalty + accPenalty;
+
+    // std::cout << "Fitness penalty: " << fitnessPenalty << std::endl;
+
+    // Adjust fitness proportionally
+    fitness -= fitnessPenalty;
+
+    return fitness;
 }
 
 // Initializer
@@ -158,6 +174,17 @@ int mutator(GAGenome &g, float p)
     if (GAFlipCoin(p))
     {
         // change the sign of a random number in the genome
+        for (int i = 0; i < genome.width(); i++)
+        {
+            for (int j = 0; j < genome.height(); j++)
+            {
+                if (GAFlipCoin(p))
+                {
+                    genome.gene(i, j, genome.gene(i, j) * -1);
+                    ++nMutations;
+                }
+            }
+        }
 
         ++nMutations;
     }
@@ -177,11 +204,12 @@ int crossover(const GAGenome &p1, const GAGenome &p2, GAGenome *c1, GAGenome *c2
     std::vector<std::vector<float>> saveVectorMean(parent1.width(), std::vector<float>(parent1.height(), 0));
 
     std::default_random_engine rng(std::random_device{}());
+    
     // one value between 0 and 1
     float weight = std::round(std::uniform_real_distribution<float>(0, 1)(rng) * 100) / 100;
 
     // print value
-    std::cout << "distribution: " << weight << std::endl;
+    // std::cout << "distribution: " << weight << std::endl;
 
     for (int i = 0; i < parent1.width(); i++)
     {
@@ -192,6 +220,31 @@ int crossover(const GAGenome &p1, const GAGenome &p2, GAGenome *c1, GAGenome *c2
             saveVectorMean[i][j] = (parent1.gene(i, j) + parent2.gene(i, j)) * 0.5;
         }
     }
+
+    // multiply the values of the parents with a random number between -1 and 1
+    if (GAFlipCoin(0.5))
+    {
+        for (int i = 0; i < parent1.width(); i++)
+        {
+            for (int j = 0; j < parent1.height(); j++)
+            {
+                saveVectorParent1[i][j] *= GARandomFloat(-2, -0.1);
+                saveVectorParent2[i][j] *= GARandomFloat(-2, -0.1);
+                saveVectorMean[i][j] *= GARandomFloat(-2, -0.1);
+            }
+        }
+    }else{
+        for (int i = 0; i < parent1.width(); i++)
+        {
+            for (int j = 0; j < parent1.height(); j++)
+            {
+                saveVectorParent1[i][j] *= GARandomFloat(0.1, 2);
+                saveVectorParent2[i][j] *= GARandomFloat(0.1, 2);
+                saveVectorMean[i][j] *= GARandomFloat(0.1, 2);
+            }
+        }
+    }
+
     // create two children
     if (c1 && c2)
     {
@@ -207,15 +260,6 @@ int crossover(const GAGenome &p1, const GAGenome &p2, GAGenome *c1, GAGenome *c2
                 child2.gene(i, j, saveVectorParent2[i][j]);
             }
         }
-
-        // // print saveVector
-        // std::cout << "child1" << std::endl;
-        // for (int i = 0; i < child1.width(); i++){
-        //     for (int j = 0; j < child1.height(); j++){
-        //         std::cout << child1.gene(i, j) << " ";
-        //     }
-        //     std::cout << std::endl;
-        // }
 
         return 2;
     }
@@ -239,6 +283,51 @@ int crossover(const GAGenome &p1, const GAGenome &p2, GAGenome *c1, GAGenome *c2
         return 0;
     }
 }
+
+
+#include <ga/GASelector.h>
+class BestTenOutOfHundredSelector : public GASelectionScheme {
+    public:
+        GADefineIdentity("BestTenOutOfHundredSelector", 0);
+
+        BestTenOutOfHundredSelector() : GASelectionScheme() {}
+        virtual ~BestTenOutOfHundredSelector() {}
+
+        virtual GASelectionScheme* clone() const {
+            return new BestTenOutOfHundredSelector;
+        }
+
+        virtual void assign(GAPopulation& p) {
+            GASelectionScheme::assign(p);
+        }
+
+        virtual void update() {
+            GASelectionScheme::update();
+        }
+
+        virtual GAGenome& select() const {
+            const int numCandidates = POPULATION_SIZE * 0.5;  // Change the number of candidates
+            const int numSelected = POPULATION_SIZE * 0.2;     // Change the number of selected individuals
+
+            int idx[numCandidates];
+            GAGenome* candidates[numCandidates];
+
+            for (int i = 0; i < numCandidates; ++i) {
+                idx[i] = GARandomInt(0, pop->size() - 1);
+                candidates[i] = &(pop->individual(idx[i]));
+            }
+
+            // Sort candidates based on their scores in descending order
+            std::sort(candidates, candidates + numCandidates,
+                    [](const GAGenome* a, const GAGenome* b) {
+                        return a->score() > b->score();
+                    });
+
+            // Return a reference to the 10th best individual
+            return *candidates[numSelected - 1];
+        }
+};
+
 
 int main()
 {
@@ -267,14 +356,49 @@ int main()
 
     GASimpleGA ga(genome);
     ga.populationSize(POPULATION_SIZE);
-    ga.nGenerations(MAX_GENERATIONS);
-    ga.pMutation(0.15);
+    ga.pMutation(0.3);
     ga.pCrossover(0.9);
-    ga.evolve();
+    ga.minimaxi(GAGeneticAlgorithm::MAXIMIZE);
+    ga.set(gaNnGenerations, MAX_GENERATIONS);
 
-    const GA2DArrayGenome<float> &bestGenome = (GA2DArrayGenome<float> &)ga.statistics().bestIndividual();
+    BestTenOutOfHundredSelector selector;
+    ga.selector(selector);
+    //ga.evolve();
 
-    std::cout << "Best genome:" << std::endl;
+    GA2DArrayGenome<float> bestGenome = genome;
+    float initialFitness = 0.0;
+    float bestFitness = 2.0;
+
+    // Evolve and output information for each generation
+    for (int generation = 1; generation <= MAX_GENERATIONS; ++generation) {
+        
+        ga.evolve();
+
+        // Access statistics
+        GAStatistics stats = ga.statistics();
+
+        if (generation % 1000 == 0) {
+            // Output information for each generation
+            std::cout << "Prozent done: " << std::ceil(static_cast<double>(generation) / MAX_GENERATIONS * 100) << "% | Generation " << generation
+                    << " | Best Fitness: " << stats.bestIndividual().score() << std::endl;
+        }
+
+        // Check if the current best individual is better than the overall best
+        if (stats.bestIndividual().score() > initialFitness) {
+            
+            initialFitness = stats.bestIndividual().score();
+            bestGenome = (GA2DArrayGenome<float>&)stats.bestIndividual();
+            
+            if (initialFitness == bestFitness){
+                break;
+            }
+        }
+
+    }
+
+    // const GA2DArrayGenome<float> &bestGenome = (GA2DArrayGenome<float> &)ga.statistics().bestIndividual();
+
+    std::cout << "\nBest genome:" << std::endl;
     for (int i = 0; i < bestGenome.width(); i++)
     {
         for (int j = 0; j < bestGenome.height(); j++)
@@ -284,12 +408,58 @@ int main()
         std::cout << std::endl;
     }
 
+
+
     std::cout << std::endl;
+
+    // shape of the layers
+    std::vector<int> input_python = OUT_WEIGHTS;
+
+    input_python.insert(input_python.begin(), IN_WEIGHTS[0]);
+
+    // get the values of the genome and put them in a 2 dimensional vector
+    std::vector<std::vector<float>> weights;
+
+    // put the values of each genome row into a vector without 0
+    for (int i = 0; i < bestGenome.width(); i++)
+    {
+        std::vector<float> row;
+        for (int j = 0; j < bestGenome.height(); j++)
+        {
+            if (bestGenome.gene(i, j) != EMPTY_PLACEHOLDER)
+            {
+                row.push_back(bestGenome.gene(i, j));
+            }
+        }
+        weights.push_back(row);
+    }
+
+    // // Display the 2D vector
+    // std::cout << std::endl;
+    // std::cout << "Weights Vector" << std::endl;
+    // for (const auto& row : weights) {
+    //     for (float value : row) {
+    //         std::cout << value << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // std::cout << std::endl;
+
+    // Ensure Python interpreter is initialized
+    PyObject *pWeights = PythonCaller::Vector2DToPyList(weights);
+    PyObject *pInput = PythonCaller::VectorToPyList(input_python);
+
+    PyObject *pArgs = PyTuple_New(2);
+    PyTuple_SetItem(pArgs, 0, pWeights);
+    PyTuple_SetItem(pArgs, 1, pInput);
+
+    float testLoss, testAcc;
+    PythonCaller::CallPythonFunction("neural_network", "main", pArgs, testLoss, testAcc);
+
+    std::cout << "C++ Output" << std::endl;
+    std::cout << "Best loss: " << testLoss << std::endl;
+    std::cout << "Best accuracy: " << testAcc << std::endl
+              << std::endl;
 
     return 0;
 }
-
-//     b0, b1, b2, b3, b4
-//     w20,21,22,23,24,25
-//     w10,11,12,13,14,15
-// L1  w00,01,02,03,04,05  L2 w06,07,08,09, L3 w010,011,012,013

@@ -2,11 +2,15 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import warnings
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.initializers import Constant
+
+# Suppress the specific NumPy warning
+warnings.filterwarnings("ignore", category=UserWarning)
 
 def data():
     
@@ -53,6 +57,18 @@ def neuralnet(training_data, parameters):
 
     return model
 
+from contextlib import contextmanager
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, 'w') as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
 def main(parameters, layer_sizes): 
 
     # Print input
@@ -70,8 +86,10 @@ def main(parameters, layer_sizes):
     # Create model
     model = neuralnet(X_train_scaled, formatted_params)
     
-    # Evaluate the model on the test set
-    test_loss, test_acc = model.evaluate(X_train_scaled, y)
+    # Use the context manager to suppress the output during model evaluation
+    with suppress_stdout():
+        # Evaluate the model on the test set
+        test_loss, test_acc = model.evaluate(X_train_scaled, y)
     
     # print(f"\nTest Loss: {test_loss}")
     # print(f"Test Accuracy: {test_acc}\n")

@@ -43,14 +43,22 @@ def neuralnet(training_data, parameters):
     # print(f"layer2_biases:\n {layer2_biases}")
     # print(f"output_weights:\n {output_weights}")
     # print(f"output_biases:\n {output_biases}")
-          
+    
+    # # Print shapes before building the model
+    # print(f"layer1_weights shape: {np.array(layer1_weights).shape}")
+    # print(f"layer1_biases shape: {np.array(layer1_biases).shape}")
+    # print(f"layer2_weights shape: {np.array(layer2_weights).shape}")
+    # print(f"layer2_biases shape: {np.array(layer2_biases).shape}")
+    # print(f"output_weights shape: {np.array(output_weights).shape}")
+    # print(f"output_biases shape: {np.array(output_biases).shape}")
+            
     # Build the neural network model with weight initialization from the big arrays
     model = Sequential()
-    model.add(Dense(64, activation='relu', input_shape=(training_data.shape[1],), kernel_initializer=Constant(value=layer1_weights), bias_initializer=Constant(value=layer1_biases)))
+    model.add(Dense(64, activation='relu', input_shape=(training_data.shape[1],), kernel_initializer=Constant(value=np.array(layer1_weights)), bias_initializer=Constant(value=np.array(layer1_biases))))
     model.add(Dropout(0.25))
-    model.add(Dense(32, activation='relu', kernel_initializer=Constant(value=layer2_weights), bias_initializer=Constant(value=layer2_biases)))
+    model.add(Dense(32, activation='relu', kernel_initializer=Constant(value=np.array(layer2_weights)), bias_initializer=Constant(value=np.array(layer2_biases))))
     model.add(Dropout(0.25))
-    model.add(Dense(1, activation='sigmoid', kernel_initializer=Constant(value=output_weights), bias_initializer=Constant(value=output_biases)))
+    model.add(Dense(1, activation='sigmoid', kernel_initializer=Constant(value=np.array(output_weights)), bias_initializer=Constant(value=np.array(output_biases))))
 
     # Compile the model
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
@@ -89,12 +97,12 @@ def main(parameters, layer_sizes):
     # Use the context manager to suppress the output during model evaluation
     with suppress_stdout():
         # Evaluate the model on the test set
-        test_loss, test_acc = model.evaluate(X_train_scaled, y)
+        loss, acc = model.evaluate(X_train_scaled, y)
     
-    # print(f"\nTest Loss: {test_loss}")
-    # print(f"Test Accuracy: {test_acc}\n")
+    # print(f"\nTest Loss: {loss}")
+    # print(f"Test Accuracy: {acc}\n")
     
-    return test_loss, test_acc
+    return loss, acc
 
 
 def format_nn_parameters(parameters, layer_sizes):

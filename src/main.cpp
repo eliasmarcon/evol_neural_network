@@ -7,10 +7,14 @@
 #include <random>
 #include <vector>
 #include <algorithm>
+#include <chrono>
+#include <fstream>
+#include <sstream>
+
 #include "PythonCaller.h"
 
 const int POPULATION_SIZE = 100;
-const int MAX_GENERATIONS = 10000;
+const int MAX_GENERATIONS = 200;
 
 const float MIN_ACCURACY = 0.85;
 const float MAX_ACCURACY = 1.0;
@@ -61,6 +65,23 @@ float objective(GAGenome &g)
         weights.push_back(row);
     }
 
+    // get the shape of the vector and print it
+    std::vector<int> shape;
+    for (std::vector<float>::size_type i = 0; i < weights.size(); i++)
+    {
+        shape.push_back(weights[i].size());
+    }
+
+    // Display the shape
+    // std::cout << std::endl;
+    // std::cout << "Shape" << std::endl;
+    // for (std::vector<float>::size_type i = 0; i < shape.size(); i++)
+    // {
+    //     std::cout << shape[i] << " ";
+    // }
+
+
+
     // // Display the 2D vector
     // std::cout << std::endl;
     // std::cout << "Weights Vector" << std::endl;
@@ -80,8 +101,8 @@ float objective(GAGenome &g)
     PyTuple_SetItem(pArgs, 0, pWeights);
     PyTuple_SetItem(pArgs, 1, pInput);
 
-    float testLoss, testAcc;
-    PythonCaller::CallPythonFunction("neural_network", "main", pArgs, testLoss, testAcc);
+    float loss, acc = 0.0;
+    PythonCaller::CallPythonFunction("neural_network", "main", pArgs, loss, acc);
 
     // std::cout << "C++ Output" << std::endl;
     // std::cout << "Test loss: " << testLoss << std::endl;
@@ -91,14 +112,14 @@ float objective(GAGenome &g)
     float lossPenalty = 0.0;
     float accPenalty = 0.0;
 
-    if (testLoss > MIN_LOSS)
+    if (loss > MIN_LOSS)
     {
-        lossPenalty = testLoss - MIN_LOSS;
+        lossPenalty = loss - MIN_LOSS;
     }
 
-    if (testAcc < MAX_ACCURACY)
+    if (acc < MAX_ACCURACY)
     {
-        accPenalty = MAX_ACCURACY - testAcc;
+        accPenalty = MAX_ACCURACY - acc;
     }
 
     float fitnessPenalty = lossPenalty + accPenalty;
@@ -349,6 +370,9 @@ int main()
             max = weight;
     }
 
+    // Start measuring time
+    // auto start_time = chrono::high_resolution_clock::now();
+
     GA2DArrayGenome<float> genome(sumIN + static_cast<int>(IN_WEIGHTS.size()), max, objective);
     genome.initializer(initializer);
     genome.mutator(mutator);
@@ -356,7 +380,7 @@ int main()
 
     GASimpleGA ga(genome);
     ga.populationSize(POPULATION_SIZE);
-    ga.pMutation(0.3);
+    ga.pMutation(0.7);
     ga.pCrossover(0.9);
     ga.minimaxi(GAGeneticAlgorithm::MAXIMIZE);
     ga.set(gaNnGenerations, MAX_GENERATIONS);
@@ -370,14 +394,20 @@ int main()
     float bestFitness = 2.0;
 
     // Evolve and output information for each generation
+    bool start = true;
     for (int generation = 1; generation <= MAX_GENERATIONS; ++generation) {
         
         ga.evolve();
+    
+        if (start){
+            std::cout << "\nStarting evolution...\n" << std::endl;
+            start = false;
+        }
 
         // Access statistics
         GAStatistics stats = ga.statistics();
 
-        if (generation % 1000 == 0) {
+        if (generation % 1 == 0) {
             // Output information for each generation
             std::cout << "Prozent done: " << std::ceil(static_cast<double>(generation) / MAX_GENERATIONS * 100) << "% | Generation " << generation
                     << " | Best Fitness: " << stats.bestIndividual().score() << std::endl;
@@ -434,16 +464,24 @@ int main()
         weights.push_back(row);
     }
 
-    // // Display the 2D vector
-    // std::cout << std::endl;
-    // std::cout << "Weights Vector" << std::endl;
-    // for (const auto& row : weights) {
-    //     for (float value : row) {
-    //         std::cout << value << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
+    // // Stop measuring time
+    // auto end_time = chrono::high_resolution_clock::now();
+    // auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
+
+    // // Calculate hours, minutes, and seconds
+    // auto hours = chrono::duration_cast<chrono::hours>(duration);
+    // duration -= hours;
+    // auto minutes = chrono::duration_cast<chrono::minutes>(duration);
+    // duration -= minutes;
+    // auto seconds = chrono::duration_cast<chrono::seconds>(duration);
+    // duration -= seconds;
+    // auto milliseconds = chrono::duration_cast<chrono::milliseconds>(duration);    
+
+    // // Print elapsed time in hours, minutes, seconds, and milliseconds
+    // std::cout << "\nTime taken for evolution: " << hours.count() << " hours, "
+    //     << minutes.count() << " minutes, "
+    //     << seconds.count() << " seconds, and "
+    //     << milliseconds.count() << " milliseconds\n" << std::endl;
 
     // Ensure Python interpreter is initialized
     PyObject *pWeights = PythonCaller::Vector2DToPyList(weights);
@@ -453,12 +491,12 @@ int main()
     PyTuple_SetItem(pArgs, 0, pWeights);
     PyTuple_SetItem(pArgs, 1, pInput);
 
-    float testLoss, testAcc;
-    PythonCaller::CallPythonFunction("neural_network", "main", pArgs, testLoss, testAcc);
+    float loss, acc = 0.0;
+    PythonCaller::CallPythonFunction("neural_network", "main", pArgs, loss, acc);
 
-    std::cout << "C++ Output" << std::endl;
-    std::cout << "Best loss: " << testLoss << std::endl;
-    std::cout << "Best accuracy: " << testAcc << std::endl
+    std::cout << "Evaluate the best weigths and biases:" << std::endl;
+    std::cout << "Best Genome loss: " << loss << std::endl;
+    std::cout << "Best Genome accuracy: " << acc << std::endl
               << std::endl;
 
     return 0;

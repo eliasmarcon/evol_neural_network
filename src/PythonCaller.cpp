@@ -25,9 +25,9 @@ PythonCaller::~PythonCaller() {
 
 PyObject* PythonCaller::CallPythonFunction(const std::string &moduleName, 
                                            const std::string &functionName, 
-                                           PyObject *args, 
-                                           float& testLoss, 
-                                           float& testAcc) {
+                                           PyObject *args,
+                                           float& loss, 
+                                           float& acc) {
 
     // Import the Python script
     PyObject *pName = PyUnicode_FromString(moduleName.c_str());
@@ -41,8 +41,8 @@ PyObject* PythonCaller::CallPythonFunction(const std::string &moduleName,
             pResult = PyObject_CallObject(pFunc, args);
             // Extract test_loss and test_acc from the returned tuple
             if (pResult != NULL && PyTuple_Check(pResult) && PyTuple_Size(pResult) == 2) {
-                testLoss = PyFloat_AsDouble(PyTuple_GetItem(pResult, 0));
-                testAcc = PyFloat_AsDouble(PyTuple_GetItem(pResult, 1));
+                loss = PyFloat_AsDouble(PyTuple_GetItem(pResult, 0));
+                acc = PyFloat_AsDouble(PyTuple_GetItem(pResult, 1));
             } else {
                 PyErr_Print();
             }

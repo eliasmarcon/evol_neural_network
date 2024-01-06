@@ -1,3 +1,0 @@
-def process_2d_array(arr):
-    print("Received 2D array:", arr)
-    # Additional processing...

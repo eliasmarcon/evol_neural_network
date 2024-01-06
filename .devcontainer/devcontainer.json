@@ -12,5 +12,4 @@
             ]
         }
     }
-    // "forwardPorts": [8080], // Uncomment or modify if port forwarding is needed
 }

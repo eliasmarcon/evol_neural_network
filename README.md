@@ -1,1 +1,1 @@
-# evol_neural_network
+# Genetic Neural Network

@@ -47,16 +47,18 @@ RUN rm -rf /tmp/galib247 /tmp/galib247.tgz
 
 # Copy the current directory contents into the container at /app
 WORKDIR /app
-COPY . /app
-# COPY src /app/src
-# COPY include /app/include
-# COPY input /app/input
-# COPY ./Makefile /app/
+
+# COPY . /app
+
+COPY src/main.cpp /app/src/main.cpp
+COPY src/PythonCaller.cpp /app/src/PythonCaller.cpp
+COPY src/neural_network.py /app/src/neural_network.py
+COPY include /app/include
+COPY input /app/input
+COPY ./Makefile /app/Makefile
 
 # Compile the project
 RUN make all
 
 # Set the default command to run the neural network
-# CMD ["/app/out/neural_network"]
-
-CMD ["/bin/bash"]
+CMD ["/app/out/neural_network"]

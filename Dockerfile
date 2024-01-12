@@ -56,9 +56,13 @@ COPY src/neural_network.py /app/src/neural_network.py
 COPY include /app/include
 COPY input /app/input
 COPY ./Makefile /app/Makefile
+COPY ./run_neural_network.sh /app/run_neural_network.sh
+COPY ./neural_network_output.txt /app/neural_network_output.txt
 
-# Compile the project
-RUN make all
+CMD ["bash", "/app/run_neural_network.sh"]
 
-# Set the default command to run the neural network
-CMD ["/app/out/neural_network"]
+# # Compile the project
+# RUN make all
+
+# # Set the default command to run the neural network
+# CMD ["/app/out/neural_network"]

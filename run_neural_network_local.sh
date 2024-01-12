@@ -1,7 +1,7 @@
 #!/bin/bash
 
-output_file="/app/neural_network_output.txt"
-output_executable="/app/out/neural_network"
+output_file="./neural_network_output.txt"
+output_executable="./out/neural_network"
 
 # Clear the output file
 > "$output_file"

@@ -55,6 +55,10 @@
         "compare": "cpp",
         "concepts": "cpp",
         "numbers": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "ratio": "cpp",
+        "cstring": "cpp",
+        "unordered_set": "cpp",
+        "iomanip": "cpp"
     }
 }

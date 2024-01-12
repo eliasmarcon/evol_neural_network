@@ -2,3 +2,5 @@ examples
 ./examples/*
 out
 sudoku
+__pycache__
+**/*.o

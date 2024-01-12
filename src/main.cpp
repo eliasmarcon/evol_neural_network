@@ -19,8 +19,8 @@
 /*============================================================= CONSTANTS ===============================================================*/
 /*========================================================================================================================================*/
 
-const int POPULATION_SIZE = 10;
-const int MAX_GENERATIONS = 4;
+const int POPULATION_SIZE = 5; //10
+const int MAX_GENERATIONS = 3; //4
 
 const float MIN_ACCURACY = 0.85;
 const float MAX_ACCURACY = 1.0;

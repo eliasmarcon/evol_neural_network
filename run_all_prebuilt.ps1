@@ -3,11 +3,6 @@ param(
     [switch]$doNotDeleteDockerContainer
 )
 
-write-host "`nPulling the Docker image...`n"
-# Pull the Docker image
-docker pull fasteiner/ubuntu-galib-neural-network
-
-
 write-host "`nRunning the Docker container...`n"
 # Run the Docker container and mount the current directory
 docker run -v "$($pwd):/app/" fasteiner/ubuntu-galib-neural-network

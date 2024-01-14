@@ -1,9 +1,5 @@
 #!/bin/bash
 
-echo -e "\Pulling the Docker image...\n"
-# Pull the Docker image
-docker pull fasteiner/ubuntu-galib-neural-network
-
 
 echo -e "\nRunning the Docker container...\n"
 # Run the Docker container and mount the current directory

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 echo -e "\nRunning the Docker container...\n"
 # Run the Docker container and mount the current directory
 docker run -v "$(pwd):/app/" fasteiner/ubuntu-galib-neural-network

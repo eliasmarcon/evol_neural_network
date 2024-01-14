@@ -1,31 +1,64 @@
-param(
-    [Alias("no")]
-    [switch]$doNotDeleteDockerContainer
+param (
+    [int]$populationSize,
+    [int]$generations,
+    [string]$deleteDocker = "yes"
 )
 
-write-host "`nBuilding the Docker image...`n"
+# Function to check if a given value is an integer
+function is-integer {
+    param($value)
+    return $value -match '^\d+$'
+}
+
+# Check for the number of arguments
+if ($populationSize -and $generations) {
+    if ((is-integer $populationSize) -and (is-integer $generations)) {
+        # Values are valid integers
+    }
+    else {
+        Write-Host "Error: populationSize and generations must be integers."
+        exit 1
+    }
+}
+elseif ($populationSize -and $generations -and ($deleteDocker -eq "yes" -or $deleteDocker -eq "no")) {
+    if ((is-integer $populationSize) -and (is-integer $generations)) {
+        # Values are valid integers
+    }
+    else {
+        Write-Host "Error: populationSize and generations must be integers."
+        exit 1
+    }
+
+    if ($deleteDocker -ne "yes" -and $deleteDocker -ne "no") {
+        Write-Host "Error: deleteDocker must be 'yes' or 'no'."
+        exit 1
+    }
+}
+else {
+    Write-Host "Usage: ./run_all.ps1 -populationSize <int> -generations <int> [-deleteDocker <yes|no>]"
+    exit 1
+}
+
+Write-Host "`nBuilding the Docker image...`n"
 # Build the Docker image
-docker build -t neural_network .
+docker build --build-arg POPULATION_SIZE="$populationSize" --build-arg GENERATIONS="$generations" -t neural_network .
 
-
-write-host "`nRunning the Docker container...`n"
+Write-Host "`nRunning the Docker container...`n"
 # Run the Docker container and mount the current directory
-docker run -v "$($pwd):/app/" neural_network
+docker run -v "$pwd:/app/" -e POPULATION_SIZE="$populationSize" -e GENERATIONS="$generations" neural_network
 
-
-write-host "`nCopying the output file from the Docker container to the host...`n"
+Write-Host "`nCopying the output file from the Docker container to the host...`n"
 # Get the Docker container ID
-$DOCKER_ID=$(docker ps -lq)
+$DOCKER_ID = (docker ps -lq)
 # Copy the output file from the Docker container to the host
-docker cp "$DOCKER_ID`:/app/neural_network_output.txt" ./neural_network_output.txt
-
+docker cp "$DOCKER_ID:/app/neural_network_output.txt" ./neural_network_output.txt
 
 # Check for the number of arguments and if the argument is "no"
-if ($doNotDeleteDockerContainer -ne $false) {
-    write-host "`nNot deleting the Docker container.`n"
+if ($deleteDocker -eq "no") {
+    Write-Host "`nNot deleting the Docker container.`n"
 }
-else{
-    write-host "`nDeleting the Docker container..."
+else {
+    Write-Host "`nDeleting the Docker container...`n"
     # Delete the Docker container
-    docker rm "$DOCKER_ID"
+    docker rm $DOCKER_ID
 }

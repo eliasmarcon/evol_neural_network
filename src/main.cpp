@@ -19,8 +19,8 @@
 /*============================================================= CONSTANTS ===============================================================*/
 /*========================================================================================================================================*/
 
-const int POPULATION_SIZE = 10; //10
-const int MAX_GENERATIONS = 5; //4
+int POPULATION_SIZE = 10; //10
+int MAX_GENERATIONS = 5; //4
 
 const float MIN_ACCURACY = 0.85;
 const float MAX_ACCURACY = 1.0;
@@ -370,8 +370,18 @@ void printNeuralNetworkDetails(){
 /*============================================================= MAIN =====================================================================*/
 /*========================================================================================================================================*/
 
-int main()
+int main(int argc, char* argv[])
 {
+
+    // set the population size and the number of generations
+    if (argc != 3) {
+        std::cout << "Usage: " << argv[0] << " <population_size> <max_generations>" << std::endl;
+        return 1;
+    }
+    
+    POPULATION_SIZE = atoi(argv[1]);
+    MAX_GENERATIONS = atoi(argv[2]);
+
     PythonCaller pythonCaller;
     srand(static_cast<unsigned int>(time(nullptr)));
 

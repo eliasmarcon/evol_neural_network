@@ -10,11 +10,14 @@ The project is ment to run just with a single bash script `run_all.sh` which set
 
 **If on Windows please make sure that the terminal you are using is a Unix-like Terminal!**
 
+**Also during the run there can be console warnings after the Neural Network is compiled and runned. These warnings can be ignored**
 
 ```sh
-./run_all.sh # to delete the docker container after the run
+./run_all.sh <populationSize> <generations> <deleteDocker>
 
-./run_all.sh no # not to delete the docker container after the run 
+./run_all.sh 5 10 yes # deletes the docker container after the run
+
+./run_all.sh 5 10 no # does not delete the docker container after the run 
 ```
 
 ## Folder Structure

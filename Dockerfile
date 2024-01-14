@@ -59,10 +59,4 @@ COPY ./Makefile /app/Makefile
 COPY ./src/run_neural_network.sh /app/src/run_neural_network.sh
 COPY ./neural_network_output.txt /app/neural_network_output.txt
 
-CMD ["bash", "/app/src/run_neural_network.sh"]
-
-# # Compile the project
-# RUN make all
-
-# # Set the default command to run the neural network
-# CMD ["/app/out/neural_network"]
+CMD ["bash", "/app/src/run_neural_network.sh", "POPULATION_SIZE", "GENERATIONS"]

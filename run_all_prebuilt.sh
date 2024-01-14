@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -e "\nBuilding the Docker image...\n"
+echo -e "\Pulling the Docker image...\n"
 # Pull the Docker image
 docker pull fasteiner/ubuntu-galib-neural-network
 

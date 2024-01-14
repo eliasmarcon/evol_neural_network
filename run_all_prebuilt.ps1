@@ -3,7 +3,7 @@ param(
     [switch]$doNotDeleteDockerContainer
 )
 
-write-host "`nBuilding the Docker image...`n"
+write-host "`nPulling the Docker image...`n"
 # Pull the Docker image
 docker pull fasteiner/ubuntu-galib-neural-network
 

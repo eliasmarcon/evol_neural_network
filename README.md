@@ -8,7 +8,7 @@ This project demonstrates the use of a Genetic Algorithm (GA) to evolve the weig
 
 The project is ment to run just with a single bash script `run_all.sh` which sets up the docker container and the executes the `run_neural_network.sh` script. After the run the output file will be copied from the docker directory into the host directory. If the argument "no" is given as input for the `run_all.sh` script, the docker container will not be deleted after the results are copied to the host directory, if the argument is not provided the docker container will be deleted.
 
-**If on Windows please make sure that the terminal you are using is a Unix-like Terminal!**
+**If on Windows please use the provided scripts int the `windows_setup` folder!**
 
 **Also during the run there can be console warnings after the Neural Network is compiled and runned. These warnings can be ignored**
 
@@ -71,7 +71,10 @@ The project is ment to run just with a single bash script `run_all.sh` which set
 
 - `neural_network_output.txt`: the output file where the result of the neural network is stored with informations about the neural network and the weights and biases as well as the evaluation results
 
-- `run_all.sh`: This Bash script automates the Docker image building and container execution process for a neural network project. It builds the Docker image, runs the container, copies the output file from the container to the host, and deletes the container afterward.
+- `run_all.sh`: This Bash script automates the Docker image building and container execution process for a neural network project. It builds the Docker image, runs the container with specified parameters for population size, generations, and an option to delete the container afterward, copies the output file from the container to the host, and deletes the container afterward if wanted.
+
+- `run_all_prebuilt.sh`: The script runs a Docker container with specified parameters for population size, generations, and an option to delete the container afterward, copying the output file from the container to the host if necessary. The Docker run command executes a container with the image fasteiner/ubuntu-galib-neural-network, mounting the current directory to the container's /app/, and passing environment variables for population size and generations.
+
 
 - `run_neural_network.sh`: This Bash script compiles a neural network program, runs it, and saves the output to a designated file. It checks for successful compilation and provides appropriate messages. If compilation is successful, it executes the program and appends the results to the specified output file.
 

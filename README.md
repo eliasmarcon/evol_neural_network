@@ -20,6 +20,24 @@ The project is ment to run just with a single bash script `run_all.sh` which set
 ./run_all.sh 5 10 no # does not delete the docker container after the run 
 ```
 
+
+**If you encounter problems with the execution and the following error pops up, please execute the following commands in the console home directory**
+
+![Alt text](/issues_img/image.png)
+
+```sh
+# first this command
+tr -d '\r' < ./src/run_neural_network.sh > ./src/run_neural_network_unix.sh
+
+# then this command
+mv ./src/run_neural_network_unix.sh ./src/run_neural_network.sh
+
+# and then this command
+chmod +x ./src/run_neural_network.sh
+
+```
+
+
 ## Folder Structure
 
 - `./include`:

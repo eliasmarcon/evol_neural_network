@@ -29,6 +29,17 @@ else
     exit 1
 fi
 
+if [ "$populationSize" -lt 10 ]
+then
+    echo "Error: populationSize must be greater than or equal to 10."
+    exit 1
+fi
+
+if [ "$generations" -lt 10 ]
+then
+    echo "Error: generations must be greater than or equal to 10."
+    exit 1
+fi
 
 echo -e "\nRunning the Docker container...\n"
 # Run the Docker container and mount the current directory

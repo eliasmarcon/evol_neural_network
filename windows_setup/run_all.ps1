@@ -39,6 +39,16 @@ else {
     exit 1
 }
 
+if ($populationSize -lt 10) {
+    Write-Host "Error: populationSize must be greater than or equal to 10."
+    exit 1
+}
+
+if ($generations -lt 10) {
+    Write-Host "Error: generations must be greater than or equal to 10."
+    exit 1
+}
+
 Write-Host "`nBuilding the Docker image...`n"
 # Build the Docker image
 docker build --build-arg POPULATION_SIZE="$populationSize" --build-arg GENERATIONS="$generations" -t neural_network .

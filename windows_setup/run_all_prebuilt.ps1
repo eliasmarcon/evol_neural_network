@@ -39,6 +39,15 @@ else {
     exit 1
 }
 
+if ($populationSize -lt 10) {
+    Write-Host "Error: populationSize must be greater than or equal to 10."
+    exit 1
+}
+
+if ($generations -lt 10) {
+    Write-Host "Error: generations must be greater than or equal to 10."
+    exit 1
+}
 
 Write-Host "`nRunning the Docker container...`n"
 # Run the Docker container and mount the current directory

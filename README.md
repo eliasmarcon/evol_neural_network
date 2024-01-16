@@ -8,6 +8,8 @@ This project demonstrates the use of a Genetic Algorithm (GA) to evolve the weig
 
 The project is ment to run just with a single bash script `run_all.sh` which sets up the docker container and the executes the `run_neural_network.sh` script. After the run the output file will be copied from the docker directory into the host directory. If the argument "no" is given as input for the `run_all.sh` script, the docker container will not be deleted after the results are copied to the host directory, if the argument is not provided the docker container will be deleted.
 
+**Another way to run the project is to run the `run_all_prebuilt.sh` which downloads a docker image from docker hub, which we uploaded via a github action and runs it with the same arguments as with the `run_all.sh` script.**
+
 **If on Windows please use the provided scripts int the `windows_setup` folder!**
 
 **Also during the run there can be console warnings after the Neural Network is compiled and runned. These warnings can be ignored**
